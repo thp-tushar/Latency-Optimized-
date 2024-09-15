@@ -1,18 +1,18 @@
 Project Overview:
 
-We've created a simulated financial trading system that focuses on low-latency order processing.
+Created a simulated financial trading system that focuses on low-latency order processing.
 The goal is to handle buy and sell orders quickly and efficiently.
 
 
 Key Components:
 a. Lock-Free Queue: Used for fast, thread-safe order submission.
-Allows multiple threads to add and remove orders without blocking each other.
+                    Allows multiple threads to add and remove orders without blocking each other.
 
 b. Order Book: Keeps track of all buy and sell orders.
-Uses sorted vectors for quick insertion and matching of orders.
+               Uses sorted vectors for quick insertion and matching of orders.
 
 c. Trading System: Manages the overall flow of orders and trades.
-Uses a separate thread for processing orders to improve responsiveness.
+                   Uses a separate thread for processing orders to improve responsiveness.
 
 
 Latency Optimization Techniques:
@@ -46,7 +46,7 @@ Implement a more realistic price discovery mechanism.
 
 
 
-This project demonstrates your understanding of:
+This project demonstrates understanding of:
 
 Advanced C++ features (templates, atomics, move semantics)
 Concurrent programming techniques
