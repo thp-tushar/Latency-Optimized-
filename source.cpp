@@ -1,25 +1,18 @@
-#include <iostream>
-#include <vector>
-#include <chrono>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <queue>
-#include <algorithm>
-#include <memory>
+using namespace std;
+#include <bits/stdc++.h>
 
 // Lock-free queue for order processing
 template<typename T>
 class LockFreeQueue {
 private:
     struct Node {
-        std::shared_ptr<T> data;
-        std::atomic<Node*> next;
+        shared_ptr<T> data;
+        atomic<Node*> next;
         Node() : next(nullptr) {}
     };
 
-    std::atomic<Node*> head;
-    std::atomic<Node*> tail;
+    atomic<Node*> head;
+    atomic<Node*> tail;
 
 public:
     LockFreeQueue() {
@@ -30,7 +23,7 @@ public:
 
     void push(T item) {
         Node* new_node = new Node();
-        new_node->data = std::make_shared<T>(std::move(item));
+        new_node->data = make_shared<T>(move(item));
 
         while (true) {
             Node* last = tail.load();
@@ -63,7 +56,7 @@ public:
                     tail.compare_exchange_weak(last, next);
                 } else {
                     if (next) {
-                        result = std::move(*next->data);
+                        result = move(*next->data);
                         if (head.compare_exchange_weak(first, next)) {
                             delete first;
                             return true;
@@ -85,13 +78,13 @@ struct Order {
 // Order book using a sorted vector for quick binary search
 class OrderBook {
 private:
-    std::vector<Order> buy_orders;
-    std::vector<Order> sell_orders;
+    vector<Order> buy_orders;
+    vector<Order> sell_orders;
 
 public:
     void addOrder(const Order& order) {
         auto& orders = (order.quantity > 0) ? buy_orders : sell_orders;
-        auto it = std::lower_bound(orders.begin(), orders.end(), order,
+        auto it = lower_bound(orders.begin(), orders.end(), order,
             [](const Order& a, const Order& b) { return a.price > b.price; });
         orders.insert(it, order);
     }
@@ -101,7 +94,7 @@ public:
 
         if (buy_orders.front().price >= sell_orders.front().price) {
             // Match found, process the trade
-            std::cout << "Trade executed: " << buy_orders.front().id << " - " << sell_orders.front().id << std::endl;
+            cout << "Trade executed: " << buy_orders.front().id << " - " << sell_orders.front().id << endl;
             buy_orders.erase(buy_orders.begin());
             sell_orders.erase(sell_orders.begin());
             return true;
@@ -116,7 +109,7 @@ class TradingSystem {
 private:
     LockFreeQueue<Order> order_queue;
     OrderBook order_book;
-    std::atomic<bool> running{true};
+    atomic<bool> running{true};
 
     void processOrders() {
         while (running) {
@@ -134,7 +127,7 @@ public:
     }
 
     void run() {
-        std::thread processor(&TradingSystem::processOrders, this);
+        thread processor(&TradingSystem::processOrders, this);
         processor.join();
     }
 
@@ -147,11 +140,11 @@ int main() {
     TradingSystem trading_system;
 
     // Simulate order submission
-    std::thread order_generator([&]() {
+    thread order_generator([&]() {
         for (int i = 0; i < 1000; ++i) {
             Order order{i, 100.0 + (rand() % 10), (rand() % 2 == 0) ? 100 : -100};
             trading_system.submitOrder(order);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            this_thread::sleep_for(chrono::milliseconds(1));
         }
         trading_system.stop();
     });
